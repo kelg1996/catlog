@@ -1,0 +1,7 @@
+<div style="width: 80%; margin: auto">
+  <app-table
+    [expandRowRender]="renderExpand"
+    (onPageChange)="handlePageChange($event)"
+    [columns]="columns"
+    [tableData]="tableData"></app-table>
+</div>

@@ -1,0 +1,48 @@
+<div>
+  <clr-datagrid  [(clrDgSelected)]="selected">
+    <clr-dg-column
+      *ngFor="let column of columns"
+      [clrDgField]="getStringKey(column.key)">
+      <ng-container *clrDgHideableColumn="{hidden: false}">
+        {{column.title}}
+      </ng-container>
+    </clr-dg-column>
+
+    <clr-dg-row
+      *clrDgItems="let item of records"
+      [clrDgItem]="item">
+      <clr-dg-cell
+        *ngFor="let column of columns"
+        [innerHTML]="renderValue(column, item)">
+      </clr-dg-cell>
+      <clr-dg-row-detail
+        [innerHTML]="expandRowRender && expandRowRender(item)"
+        *clrIfExpanded>
+      </clr-dg-row-detail>
+    </clr-dg-row>
+
+    <clr-dg-footer>
+      <clr-dg-pagination #pagination >
+        <clr-dg-page-size [clrPageSizeOptions]="[5,10,20,30, 50, 100]">Users per page</clr-dg-page-size>
+<!--        {{(pageNumber - 1) * pageSize + 1}} - {{pageNumber * pageSize}}-->
+        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+        of {{pagination.totalItems}} records
+<!--        <cds-icon-->
+<!--          (click)="handleClickFirstPage()"-->
+<!--          role="button" class="ml-20 mr-10" shape="step-forward-2" direction="down"></cds-icon>-->
+<!--        <cds-icon-->
+<!--          (click)="handleClickPrevPage()"-->
+<!--          role="button" class="mr-10" shape="angle" direction="left"></cds-icon>-->
+<!--        <input [value]="pageValue"-->
+<!--               (keydown.enter)="handleEnterKey($event)"-->
+<!--               (input)="handleEnterPage($event)" class="input" />-->
+<!--        <cds-icon-->
+<!--          (click)="handleClickNextPage()"-->
+<!--          role="button" class="ml-10 mr-10" shape="angle" direction="right"></cds-icon>-->
+<!--        <cds-icon-->
+<!--          (click)="handleClickLastPage()"-->
+<!--          role="button" class="mr-20" shape="step-forward-2" direction="up"></cds-icon>-->
+      </clr-dg-pagination>
+    </clr-dg-footer>
+  </clr-datagrid>
+</div>
