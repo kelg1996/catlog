@@ -6,8 +6,13 @@
       <ng-container *clrDgHideableColumn="{hidden: false}">
         {{column.title}}
       </ng-container>
-    </clr-dg-column>
+      <clr-dg-filter
+        *ngIf="column?.filter"
+        [clrDgFilter]="getFilter(column)">
+        <ng-container filterHost></ng-container>
+      </clr-dg-filter>
 
+    </clr-dg-column>
     <clr-dg-row
       *clrDgItems="let item of records"
       [clrDgItem]="item">

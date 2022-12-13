@@ -1,17 +1,28 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  AfterViewInit,
+  SimpleChanges, Type,
+  ViewChild, ViewContainerRef, ViewChildren, QueryList
+} from '@angular/core';
 import {TableColumn, TableColumns, TableData} from "./table.types";
 import {Observable} from "rxjs";
 import '@cds/core/icon/register.js';
 import { ClarityIcons, angleIcon, stepForward2Icon } from '@cds/core/icon';
-import {ClrDatagridFilterInterface} from "@clr/angular";
-import {AgeFilter} from "../home/home.component";
+
+import {FilterDirective} from "./FilterDirective";
+import {ClrDatagridFilter, ClrDatagridFilterInterface} from "@clr/angular";
 ClarityIcons.addIcons(angleIcon, stepForward2Icon);
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.css'],
 })
-export class TableComponent implements OnInit, OnChanges{
+export class TableComponent implements OnInit, OnChanges, AfterViewInit{
   records: TableData<any> = [];
   pageValue: number | string = 1;
   selected: any[] = [];
@@ -22,8 +33,20 @@ export class TableComponent implements OnInit, OnChanges{
   @Input() pageSize: number = 10;
   @Input() total: number = 0;
   @Output() onPageChange = new EventEmitter<number>();
+  @ViewChildren(FilterDirective) filterHosts!: QueryList<FilterDirective>;
   constructor() { }
 
+  ngAfterViewInit() {
+    // child is set
+    const columnFilterComponents = this.columns.filter(column => 'filter' in column).map(column => column?.filter?.component);
+    const columnFilters = this.columns.filter(column => 'filter' in column).map(column => column?.filter?.filter);
+    this.filterHosts.forEach((filterDirective, index: number) => {
+      const viewContainerRef = filterDirective.viewContainerRef;
+      viewContainerRef.clear();
+      const componentRef = viewContainerRef.createComponent(columnFilterComponents[index] as Type<any>);
+      componentRef.instance.filter = columnFilters[index];
+    })
+  }
   refresh() {
     if (Array.isArray(this.tableData)) {
       this.records = this.tableData;
@@ -32,6 +55,10 @@ export class TableComponent implements OnInit, OnChanges{
         this.records = data;
       })
     }
+  }
+
+  getFilter(column: TableColumn<any>) {
+    return column?.filter?.filter as ClrDatagridFilterInterface<any>;
   }
 
   ngOnChanges(changes: SimpleChanges) {
