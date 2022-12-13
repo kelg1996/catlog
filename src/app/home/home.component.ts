@@ -4,52 +4,43 @@ import { faker } from '@faker-js/faker';
 import {Observable, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {ClrDatagridFilterInterface} from "@clr/angular";
+import {AgefilterComponent} from "../agefilter/agefilter.component";
+import {DatefilterComponent} from "../datefilter/datefilter.component";
 
-interface Person {
-  id: string;
-  age: number;
-  firstname: string;
-  lastname: string;
-  address: string;
-  introduction: string;
+
+interface Todo {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
 }
 
-const mockApi: () => Observable<{total: number,
-  data: Person[],
-  page: number}> = () => {
-  return new Observable(ob => {
-    const persons = [];
-    const total = 1012;
-    const page = 1;
-    for (let i = 0; i < 1012; i ++) {
-      persons.push({
-        id: faker.datatype.uuid(),
-        age: Math.ceil(10 + Math.random() * 40),
-        firstname: faker.name.firstName(),
-        lastname: faker.name.lastName(),
-        address: faker.address.streetAddress(),
-        introduction: faker.hacker.phrase()
-      })
-    }
-    ob.next({
-      total: total,
-      data: persons,
-      page: Number(page)
-    })
-  })
-}
 
-export  class AgeFilter implements ClrDatagridFilterInterface<Person> {
-  changes = new Subject<any>;
-  value = '';
-  accepts(item: Person): boolean {
-    return item.age > Number(this.value);
+
+export  class AgeFilter implements ClrDatagridFilterInterface<Todo> {
+  changes = new Subject<any>();
+  public minAge!: number;
+  public  maxAge!: number;
+  accepts(person: Todo): boolean {
+    return true
   }
 
   isActive(): boolean {
-    return this.value.length > 0;
+    return false
   }
 
+}
+
+export class BirthdayFilter implements ClrDatagridFilterInterface<Todo> {
+  changes = new Subject<any>;
+  value = '';
+  accepts(item: Todo): boolean {
+    return true
+  }
+
+  isActive(): boolean {
+    return false
+  }
 }
 
 @Component({
@@ -58,46 +49,38 @@ export  class AgeFilter implements ClrDatagridFilterInterface<Person> {
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  columns: TableColumns<Person> = [
+  columns: TableColumns<Todo> = [
+    {
+      title: 'User ID',
+      key: 'userId'
+    },
     {
       title: 'ID',
-      key: 'id'
+      key: 'id',
     },
     {
-      title: 'Age',
-      key: 'age',
-      filter: new AgeFilter()
+      title: 'Title',
+      key: 'title',
     },
     {
-      title: 'First name',
-      key: 'firstname'
-    },
-    {
-      title: 'Last name',
-      key: 'lastname'
-    },
-    {
-      title: 'Address',
-      key: 'address',
-      render: (p) => {
-        return `<p class="bg-red">${p.address}</p>`
+      title: 'Status',
+      key: 'completed',
+      render: (todo: Todo) => {
+        return todo.completed ? 'Finished' : 'Not Yet'
       }
     },
-    {
-      title: 'Introduction',
-      key: 'introduction',
-    },
+
   ];
-  tableData: TableData<Person> | Observable<TableData<Person>> = [];
+  tableData: TableData<Todo> | Observable<TableData<Todo>> = [];
   page = 1;
   pageSize = 10;
   total = 1000;
   constructor(private httpClient: HttpClient) { }
 
 
-  renderExpand(p: Person) {
+  renderExpand(p: Todo) {
     return `
-      <pre class="bg-red">${p.address + p.introduction}</pre>
+      <pre class="bg-red">${p.title}</pre>
     `
   }
 
@@ -107,12 +90,10 @@ export class HomeComponent implements OnInit {
   }
 
   requestApi() {
-    mockApi()
-      .subscribe((result) => {
-        this.total = result.total;
-        this.tableData = result.data;
+    this.httpClient.get<Todo[]>(`https://jsonplaceholder.typicode.com/todos/`)
+      .subscribe(data => {
+        this.tableData = data
       })
-
   }
 
   ngOnInit(): void {
