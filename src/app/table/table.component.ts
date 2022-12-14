@@ -134,4 +134,21 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit{
     return String(key);
   }
 
+showTCExportMenu=false
+  showTEExportMenu=false
+  exportAsXLSX(data, name, reimport=false):void {
+    let table = data
+
+    reimport? null: table.forEach(
+                    table => { table.justification? table.justification = table.justification.replace(/<\/?(?!a)\w*\b[^>]*>/ig, ''): null,
+                              table.evidence?  table.evidence = table.evidence.replace(/<\/?(?!a)\w*\b[^>]*>/ig, ''): null,
+                              delete table.id, delete table.log
+                              })
+
+
+    // execu ? this.getTestExecu(this.uuid): this.getTestCat(this.uuid)
+
+    this.excelService.exportAsExcelFile(table, name);
+    this.showTCExportMenu=false
+    this.showTEExportMenu=false
 }
