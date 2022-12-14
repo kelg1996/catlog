@@ -27,6 +27,7 @@
     </clr-dg-row>
 
     <clr-dg-footer>
+      <button class="btn" (click)="exportAsXLSX(tableData, 'example', true)">Export to excel</button>
       <clr-dg-pagination #pagination >
         <clr-dg-page-size [clrPageSizeOptions]="[5,10,20,30, 50, 100]">Users per page</clr-dg-page-size>
 <!--        {{(pageNumber - 1) * pageSize + 1}} - {{pageNumber * pageSize}}-->
