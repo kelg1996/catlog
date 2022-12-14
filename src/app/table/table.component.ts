@@ -34,7 +34,7 @@ export class TableComponent implements OnInit, OnChanges, AfterViewInit{
   @Input() total: number = 0;
   @Output() onPageChange = new EventEmitter<number>();
   @ViewChildren(FilterDirective) filterHosts!: QueryList<FilterDirective>;
-  constructor() { }
+  constructor(private excelService:ExcelService) { }
 
   ngAfterViewInit() {
     // child is set
