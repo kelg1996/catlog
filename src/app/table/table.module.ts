@@ -4,12 +4,15 @@ import {TableComponent} from "./table.component";
 import {ClarityModule} from "@clr/angular";
 import {BrowserModule} from "@angular/platform-browser";
 import {FilterDirective} from './FilterDirective';
+import {ColumnDirective} from "./ColumnDirective";
+
 
 
 @NgModule({
   declarations: [
     TableComponent,
-    FilterDirective
+    FilterDirective,
+    ColumnDirective
   ],
   imports: [
     ClarityModule,

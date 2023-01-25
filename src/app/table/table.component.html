@@ -1,18 +1,34 @@
 <div>
+  <button (click)="handleClickExport()" class="btn btn-primary">Export</button>
   <clr-datagrid  [(clrDgSelected)]="selected">
+
     <clr-dg-column
-      *ngFor="let column of columns"
+      columnHost
+      [attr.data-name]="column.key"
+      *ngFor="let column of tableColumns"
       [clrDgField]="getStringKey(column.key)">
-      <ng-container *clrDgHideableColumn="{hidden: false}">
-        {{column.title}}
+
+      <ng-container
+        *clrDgHideableColumn="{hidden: false}">
+        <span>{{column.title}}</span>
       </ng-container>
+
       <clr-dg-filter
-        *ngIf="column?.filter"
+        *ngIf="column?.filter?.component"
         [clrDgFilter]="getFilter(column)">
         <ng-container filterHost></ng-container>
       </clr-dg-filter>
 
+      <clr-dg-string-filter
+        *ngIf="!column?.filter?.component"
+        (clrFilterValueChange)="handleStringFilterChange($event, column)"
+        [clrDgStringFilter]="getStringFilter(column)"
+      ></clr-dg-string-filter>
+
+
     </clr-dg-column>
+
+
     <clr-dg-row
       *clrDgItems="let item of records"
       [clrDgItem]="item">
@@ -27,7 +43,6 @@
     </clr-dg-row>
 
     <clr-dg-footer>
-      <button class="btn" (click)="exportAsXLSX(tableData, 'example', true)">Export to excel</button>
       <clr-dg-pagination #pagination >
         <clr-dg-page-size [clrPageSizeOptions]="[5,10,20,30, 50, 100]">Users per page</clr-dg-page-size>
 <!--        {{(pageNumber - 1) * pageSize + 1}} - {{pageNumber * pageSize}}-->
